@@ -1,0 +1,42 @@
+language: php
+
+addons:
+  postgresql: "9.6"
+
+services:
+  - docker
+  - postgresql
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+    - $HOME/.npm
+    - $HOME/.nvm
+
+env:
+  global:
+    - DB=pgsql
+
+matrix:
+  include:
+    - php: 7.3
+      env: MOODLE_BRANCH=MOODLE_39_STABLE
+    - php: 7.3
+      env: MOODLE_BRANCH=MOODLE_310_STABLE
+    - php: 7.4
+      env: MOODLE_BRANCH=MOODLE_311_STABLE
+
+before_install:
+  - phpenv config-rm xdebug.ini
+  - cd ../..
+  - composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^3
+  - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
+
+install:
+  - moodle-plugin-ci install
+
+script:
+  - moodle-plugin-ci codechecker --max-warnings 0
+  - moodle-plugin-ci grunt --max-lint-warnings 0
+  - moodle-plugin-ci phpunit --coverage-text
+  - moodle-plugin-ci behat --profile chrome

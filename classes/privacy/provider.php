@@ -14,15 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+declare(strict_types=1);
+
+namespace customfield_picture\privacy;
+
+use core_privacy\local\metadata\null_provider;
+
 /**
- * Plugin language strings
+ * Plugin privacy provider
  *
  * @package    customfield_picture
  * @copyright  2022 Paul Holden <paulh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+class provider implements null_provider {
 
-defined('MOODLE_INTERNAL') || die;
-
-$string['pluginname'] = 'Picture';
-$string['privacy:metadata'] = 'The Picture custom field plugin does not store any personal data';
+    /**
+     * Plugin language string identifier to explain why this plugin stores no data
+     *
+     * @return string
+     */
+    public static function get_reason(): string {
+        return 'privacy:metadata';
+    }
+}
