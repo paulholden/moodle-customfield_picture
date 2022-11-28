@@ -122,4 +122,15 @@ class data_controller extends \core_customfield\data_controller {
 
         return html_writer::img((string) $fileurl, $this->get_field()->get_formatted_name());
     }
+
+    /**
+     * Delete individual field data
+     *
+     * @return bool
+     */
+    public function delete(): bool {
+        get_file_storage()->delete_area_files($this->get_context()->id, 'customfield_picture', 'file', $this->get('id'));
+
+        return parent::delete();
+    }
 }

@@ -45,4 +45,23 @@ class field_controller  extends \core_customfield\field_controller {
             get_max_upload_sizes($CFG->maxbytes));
         $mform->setType('configdata[maximumbytes]', PARAM_INT);
     }
+
+    /**
+     * Delete all field data
+     *
+     * @return bool
+     */
+    public function delete(): bool {
+        global $DB;
+
+        // Delete all files linked to the field being deleted.
+        $select = 'component = :component AND itemid IN (SELECT id FROM {customfield_data} WHERE fieldid = :fieldid)';
+
+        $files = $DB->get_records_select('files', $select, ['component' => 'customfield_picture', 'fieldid' => $this->get('id')]);
+        foreach ($files as $file) {
+            get_file_storage()->get_file_instance($file)->delete();
+        }
+
+        return parent::delete();
+    }
 }
