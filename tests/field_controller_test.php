@@ -63,11 +63,24 @@ class field_controller_test extends advanced_testcase {
             'maximumbytes' => 1024,
         ]]);
 
-        $formdata = field_config_form::mock_ajax_submit((array) $field->to_record());
-        $form = new field_config_form(null, null, 'post', '', null, true, $formdata, true);
+        $submitdata = (array) $field->to_record();
+        $submitdata['configdata'] = $field->get('configdata');
 
-        $form->set_data_for_dynamic_submission();
-        $this->assertTrue($form->is_validated());
-        $form->process_dynamic_submission();
+        // Ensure compatibility across Moodle versions, required for <3.11.
+        if (!method_exists(field_config_form::class, 'mock_ajax_submit')) {
+            field_config_form::mock_submit($submitdata, []);
+            $handler = $category->get_handler();
+
+            $form = $handler->get_field_config_form($field);
+            $this->assertTrue($form->is_validated());
+            $handler->save_field_configuration($field, $form->get_data());
+        } else {
+            $formdata = field_config_form::mock_ajax_submit($submitdata);
+            $form = new field_config_form(null, null, 'post', '', null, true, $formdata, true);
+
+            $form->set_data_for_dynamic_submission();
+            $this->assertTrue($form->is_validated());
+            $form->process_dynamic_submission();
+        }
     }
 }
