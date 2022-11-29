@@ -26,6 +26,6 @@ defined('MOODLE_INTERNAL') || die;
 
 $plugin->component = 'customfield_picture';
 $plugin->release   = '1.0';
-$plugin->version   = 2022041400;
+$plugin->version   = 2022112900;
 $plugin->requires  = 2020061500; // Moodle 3.9 onwards.
 $plugin->maturity  = MATURITY_STABLE;
