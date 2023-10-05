@@ -59,9 +59,13 @@ class field_controller_test extends advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('core_customfield');
 
         $category = $generator->create_category();
-        $field = $generator->create_field(['categoryid' => $category->get('id'), 'type' => 'picture', 'configdata' => [
-            'maximumbytes' => 1024,
-        ]]);
+        $field = $generator->create_field([
+            'categoryid' => $category->get('id'),
+            'type' => 'picture',
+            'configdata' => [
+                'maximumbytes' => 1024,
+            ],
+        ]);
 
         $submitdata = (array) $field->to_record();
         $submitdata['configdata'] = $field->get('configdata');
