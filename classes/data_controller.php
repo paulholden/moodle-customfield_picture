@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace customfield_picture;
 
+use backup_nested_element;
 use html_writer;
 use moodle_url;
 use MoodleQuickForm;
@@ -101,6 +102,35 @@ class data_controller extends \core_customfield\data_controller {
      */
     public function get_default_value(): int {
         return 0;
+    }
+
+    /**
+     * Implement the backup callback in order to include embedded files.
+     *
+     * @param \backup_nested_element $customfieldelement
+     * @return void
+     */
+    public function backup_define_structure(backup_nested_element $customfieldelement): void {
+        $annotations = $customfieldelement->get_file_annotations();
+
+        if (!isset($annotations['customfield_picture']['file'])) {
+            $customfieldelement->annotate_files('customfield_picture', 'file', 'id');
+        }
+    }
+
+    /**
+     * Implement the restore callback in order to restore embedded files.
+     *
+     * @param \restore_structure_step $step
+     * @param int $newid
+     * @param int $oldid
+     * @return void
+     */
+    public function restore_define_structure(\restore_structure_step $step, int $newid, int $oldid): void {
+        if (!$step->get_mappingid('customfield_picture_data', $oldid)) {
+            $step->set_mapping('customfield_picture_data', $oldid, $newid, true);
+            $step->add_related_files('customfield_picture', 'file', 'customfield_picture_data');
+        }
     }
 
     /**
