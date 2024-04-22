@@ -30,7 +30,7 @@ use core_customfield\field_config_form;
  * @copyright  2022 Paul Holden <paulh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class field_controller_test extends advanced_testcase {
+final class field_controller_test extends advanced_testcase {
 
     /**
      * Test that using base field controller returns our picture type
