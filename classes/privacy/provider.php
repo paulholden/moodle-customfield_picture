@@ -18,7 +18,11 @@ declare(strict_types=1);
 
 namespace customfield_picture\privacy;
 
+use core_customfield\data_controller;
+use core_customfield\privacy\customfield_provider;
 use core_privacy\local\metadata\null_provider;
+use core_privacy\local\request\writer;
+use stdClass;
 
 /**
  * Plugin privacy provider
@@ -27,7 +31,7 @@ use core_privacy\local\metadata\null_provider;
  * @copyright  2022 Paul Holden <paulh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements null_provider {
+class provider implements null_provider, customfield_provider {
 
     /**
      * Plugin language string identifier to explain why this plugin stores no data
@@ -36,5 +40,40 @@ class provider implements null_provider {
      */
     public static function get_reason(): string {
         return 'privacy:metadata';
+    }
+
+    /**
+     * Preprocesses data object that is going to be exported
+     *
+     * @param data_controller $data
+     * @param stdClass $exportdata
+     * @param array $subcontext
+     */
+    public static function export_customfield_data(data_controller $data, stdClass $exportdata, array $subcontext): void {
+        writer::with_context($data->get_context())->export_area_files($subcontext, 'customfield_picture', 'file', $data->get('id'));
+    }
+
+    /**
+     * Callback to clean up any related files prior to data record deletion
+     *
+     * @param string $select
+     * @param array $params
+     * @param int[] $contextids
+     */
+    public static function before_delete_data(string $select, array $params, array $contextids): void {
+        foreach ($contextids as $contextid) {
+            get_file_storage()->delete_area_files_select($contextid, 'customfield_picture', 'file', $select, $params);
+        }
+    }
+
+    /**
+     * Callback to clean up any related field prior to field record deletion
+     *
+     * @param string $select
+     * @param array $params
+     * @param int[] $contextids
+     */
+    public static function before_delete_fields(string $select, array $params, array $contextids): void {
+
     }
 }
